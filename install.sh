@@ -160,24 +160,44 @@ step "Configuring shell prompts"
 
 _add_prompt_integration() {
     local rc_file="$1"
-    local var_name="$2"
+    local shell_type="$2"
     
     if [[ -f "$rc_file" ]]; then
         if grep -q 'gituser current' "$rc_file"; then
             info "Prompt integration already exists in $rc_file"
         else
             printf '\n# git-identity-manager prompt integration\n' >> "$rc_file"
-            if [[ "$var_name" == "PROMPT" ]]; then
-                printf 'setopt prompt_subst 2>/dev/null || true\n' >> "$rc_file"
+            if [[ "$shell_type" == "zsh" ]]; then
+                cat << 'EOF' >> "$rc_file"
+setopt prompt_subst 2>/dev/null || true
+# Intelligently inject before the last newline if the prompt is multi-line
+if [[ "$PROMPT" == *$'\n'* ]]; then
+  PROMPT="${PROMPT%$'\n'*}\$(gituser current)"$'\n'"${PROMPT##*$'\n'}"
+elif [[ "$PROMPT" == *'\n'* ]]; then
+  PROMPT="${PROMPT%\\n*}\$(gituser current)\n${PROMPT##*\\n}"
+else
+  PROMPT="${PROMPT}\$(gituser current)"
+fi
+EOF
+            elif [[ "$shell_type" == "bash" ]]; then
+                cat << 'EOF' >> "$rc_file"
+# Intelligently inject before the last newline if the prompt is multi-line
+if [[ "$PS1" == *$'\n'* ]]; then
+  PS1="${PS1%$'\n'*}\$(gituser current)"$'\n'"${PS1##*$'\n'}"
+elif [[ "$PS1" == *'\n'* ]]; then
+  PS1="${PS1%\\n*}\$(gituser current)\n${PS1##*\\n}"
+else
+  PS1="${PS1}\$(gituser current)"
+fi
+EOF
             fi
-            printf '%s="${%s}\\$(gituser current)"\n' "$var_name" "$var_name" >> "$rc_file"
-            ok "Added prompt integration to $rc_file"
+            ok "Added smart prompt integration to $rc_file"
         fi
     fi
 }
 
-_add_prompt_integration "$HOME/.bashrc" "PS1"
-_add_prompt_integration "$HOME/.zshrc" "PROMPT"
+_add_prompt_integration "$HOME/.bashrc" "bash"
+_add_prompt_integration "$HOME/.zshrc" "zsh"
 
 # ------------------------------------------------------------------------------
 # Done
