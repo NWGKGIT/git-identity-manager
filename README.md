@@ -98,8 +98,8 @@ When you run `gituser use <profile>`, it writes to your local `.git/config`:
 
 ```ini
 [user]
-    name  = Nahom Gebremichael
-    email = nahom@company.com
+    name  = [First Name] [Last Name]
+    email = [email_address]
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519_work -o IdentitiesOnly=yes
 ```
