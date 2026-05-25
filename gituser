@@ -334,6 +334,23 @@ cmd_status() {
     echo ""
 }
 
+cmd_current() {
+    # Only show in git repositories
+    git rev-parse --is-inside-work-tree &>/dev/null || return 0
+    
+    local current_email
+    current_email=$(git config user.email 2>/dev/null || true)
+    if [[ -n "$current_email" ]] && [[ -f "$CONFIG_FILE" ]]; then
+        awk -F'=' -v email="$current_email" '
+            /^\[.*\]$/ { gsub(/\[|\]/, "", $0); curr_prof=$0 }
+            $1 ~ /^[ \t]*email[ \t]*$/ {
+                gsub(/^[ \t]+|[ \t]+$/, "", $2)
+                if ($2 == email) { print " ("curr_prof")"; exit 0 }
+            }
+        ' "$CONFIG_FILE"
+    fi
+}
+
 cmd_list() {
     if no_profiles; then
         echo "No profiles configured. Run 'gituser init' to get started."
@@ -584,6 +601,7 @@ cmd_help() {
     echo "Commands:"
     printf "  %-34s %s\n" "init"                         "Run the setup wizard"
     printf "  %-34s %s\n" "status"                       "Show the current Git identity"
+    printf "  %-34s %s\n" "current"                      "Print the active profile name (useful for prompts)"
     printf "  %-34s %s\n" "list"                         "List all saved profiles"
     printf "  %-34s %s\n" "use <profile>"                "Apply a profile to the current repo"
     printf "  %-34s %s\n" "use <profile> --global"       "Apply a profile globally"
@@ -616,7 +634,7 @@ shift || true
 # Auto-init: when no profiles are configured, prompt to run setup wizard.
 # Commands that don't require profiles are excluded.
 case "$CMD" in
-    init|help|--help|-h|version|--version|-v|doctor) ;;
+    init|help|--help|-h|version|--version|-v|doctor|current) ;;
     *)
         if no_profiles; then
             echo ""
@@ -635,6 +653,7 @@ esac
 case "$CMD" in
     init)              cmd_init    "$@" ;;
     status)            cmd_status  "$@" ;;
+    current)           cmd_current "$@" ;;
     list)              cmd_list    "$@" ;;
     use)               cmd_use     "$@" ;;
     add)               cmd_add     "$@" ;;
