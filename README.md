@@ -145,13 +145,13 @@ You do not need to edit this file manually — use the CLI commands.
 
 ```ini
 [work]
-name = Nahom Gebremichael
-email = nahom@company.com
+name = [First Name] [Last Name]
+email = [email_address]
 ssh_key = ~/.ssh/id_ed25519_work
 
 [personal]
-name = Nahom
-email = nahom@personal.com
+name = [First Name] [Last Name]
+email = [personal_email_address]
 ssh_key = ~/.ssh/id_ed25519_personal
 ```
 
