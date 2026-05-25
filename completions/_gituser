@@ -17,6 +17,7 @@ _gituser() {
     commands=(
         'init:Run the setup wizard'
         'status:Show the current Git identity'
+        'current:Print the active profile name'
         'list:List all saved profiles'
         'use:Apply a profile to the current repo'
         'add:Add a new profile interactively'

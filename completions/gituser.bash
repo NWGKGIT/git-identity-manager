@@ -15,7 +15,7 @@ _gituser_complete() {
     local prev="${COMP_WORDS[COMP_CWORD-1]}"
     local subcmd="${COMP_WORDS[1]:-}"
 
-    local all_commands="init status list use add edit rename remove clone doctor version help"
+    local all_commands="init status current list use add edit rename remove clone doctor version help"
 
     if [[ $COMP_CWORD -eq 1 ]]; then
         COMPREPLY=($(compgen -W "$all_commands" -- "$cur"))
