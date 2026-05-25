@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# gitclone - Clone a repository and apply a Git identity profile
+# Part of git-identity-manager: https://github.com/NWGKGIT/git-identity-manager
+#
+# Usage: gitclone <url> [directory] [--as <profile>]
+# ==============================================================================
+
+exec gituser clone "$@"

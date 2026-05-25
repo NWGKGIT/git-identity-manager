@@ -1,0 +1,76 @@
+#compdef gituser
+
+# ==============================================================================
+# Zsh completion for gituser
+# Install: copy to a directory in your $fpath, e.g. ~/.zsh/completions/_gituser
+# The install.sh script handles this automatically.
+# ==============================================================================
+
+_gituser_profile_names() {
+    local config="${GIT_PROFILES:-$HOME/.git-profiles}"
+    [[ -f "$config" ]] || return
+    grep '^\[' "$config" 2>/dev/null | tr -d '[]'
+}
+
+_gituser() {
+    local -a commands
+    commands=(
+        'init:Run the setup wizard'
+        'status:Show the current Git identity'
+        'list:List all saved profiles'
+        'use:Apply a profile to the current repo'
+        'add:Add a new profile interactively'
+        'edit:Edit an existing profile'
+        'rename:Rename a profile'
+        'remove:Remove a profile'
+        'clone:Clone a repo and apply a profile'
+        'doctor:Check configuration health'
+        'version:Print version'
+        'help:Show help'
+    )
+
+    local -a profiles
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && profiles+=("$line")
+    done < <(_gituser_profile_names)
+
+    case $CURRENT in
+        2)
+            _describe 'command' commands
+            ;;
+        3)
+            case "${words[2]}" in
+                use)
+                    _describe 'profile' profiles
+                    ;;
+                edit|remove)
+                    _describe 'profile' profiles
+                    ;;
+                rename)
+                    _describe 'old profile' profiles
+                    ;;
+                clone)
+                    _arguments '--as[Profile to apply after cloning]:profile:(${profiles[@]})'
+                    ;;
+            esac
+            ;;
+        4)
+            case "${words[2]}" in
+                use)
+                    _arguments '--global[Apply the profile globally]'
+                    ;;
+                rename)
+                    # Second argument is the new name — no completion
+                    ;;
+                clone)
+                    case "${words[3]}" in
+                        --as) _describe 'profile' profiles ;;
+                        *)    _arguments '--as[Profile to apply after cloning]:profile:(${profiles[@]})' ;;
+                    esac
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_gituser "$@"
