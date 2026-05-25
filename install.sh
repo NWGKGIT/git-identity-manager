@@ -153,6 +153,33 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Install prompt integration
+# ------------------------------------------------------------------------------
+
+step "Configuring shell prompts"
+
+_add_prompt_integration() {
+    local rc_file="$1"
+    local var_name="$2"
+    
+    if [[ -f "$rc_file" ]]; then
+        if grep -q 'gituser current' "$rc_file"; then
+            info "Prompt integration already exists in $rc_file"
+        else
+            printf '\n# git-identity-manager prompt integration\n' >> "$rc_file"
+            if [[ "$var_name" == "PROMPT" ]]; then
+                printf 'setopt prompt_subst 2>/dev/null || true\n' >> "$rc_file"
+            fi
+            printf '%s="${%s}\\$(gituser current)"\n' "$var_name" "$var_name" >> "$rc_file"
+            ok "Added prompt integration to $rc_file"
+        fi
+    fi
+}
+
+_add_prompt_integration "$HOME/.bashrc" "PS1"
+_add_prompt_integration "$HOME/.zshrc" "PROMPT"
+
+# ------------------------------------------------------------------------------
 # Done
 # ------------------------------------------------------------------------------
 
