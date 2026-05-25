@@ -74,6 +74,7 @@ gitclone git@github.com:org/repo.git --as work   # shorthand
 |---|---|
 | `gituser init` | Run the interactive setup wizard |
 | `gituser status` | Show the current Git identity (works inside and outside a repo) |
+| `gituser current` | Print the active profile name (useful for shell prompts) |
 | `gituser list` | List all saved profiles |
 | `gituser use <profile>` | Apply a profile to the current repository |
 | `gituser use <profile> --global` | Apply a profile globally |
@@ -159,6 +160,26 @@ Override the config file path with the `GIT_PROFILES` environment variable:
 
 ```bash
 GIT_PROFILES=/path/to/custom-profiles gituser list
+```
+
+---
+
+## Shell prompt integration
+
+The installer automatically adds prompt integration to your `.bashrc` and `.zshrc`. 
+When you are inside a Git repository, it will show the active profile in your prompt (e.g., `git:(main) (work)`). 
+
+If you prefer to configure it manually, the command `gituser current` returns ` (profile_name)` when inside a repository. It is extremely fast and designed to run on every prompt draw.
+
+**Manual Bash (`~/.bashrc`)**
+```bash
+PS1="${PS1}\$(gituser current)"
+```
+
+**Manual Zsh (`~/.zshrc`)**
+```zsh
+setopt prompt_subst
+PROMPT="${PROMPT}\$(gituser current)"
 ```
 
 ---
